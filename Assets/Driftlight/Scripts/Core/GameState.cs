@@ -6,7 +6,7 @@ namespace Driftlight
     /// <summary>Progress for the current run that carries across scene loads (salvage, signal fragments).</summary>
     public static class GameState
     {
-        public const int TotalFragments = 5;
+        public const int TotalFragments = 3;
 
         public static int Salvage { get; private set; }
         public static int FragmentsFound { get; private set; }

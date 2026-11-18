@@ -31,17 +31,17 @@ namespace Driftlight.EditorTools
 
             RenderSettings.skybox = PanoramicSkybox("Space Skybox", SpaceSkyTexture(), 1f);
             RenderSettings.ambientMode = AmbientMode.Trilight;
-            RenderSettings.ambientSkyColor = new Color(0.1f, 0.11f, 0.2f);
-            RenderSettings.ambientEquatorColor = new Color(0.06f, 0.05f, 0.1f);
-            RenderSettings.ambientGroundColor = new Color(0.02f, 0.02f, 0.035f);
+            RenderSettings.ambientSkyColor = new Color(0.17f, 0.16f, 0.28f);
+            RenderSettings.ambientEquatorColor = new Color(0.11f, 0.08f, 0.16f);
+            RenderSettings.ambientGroundColor = new Color(0.04f, 0.035f, 0.06f);
             RenderSettings.fog = false;
             RenderSettings.defaultReflectionMode = DefaultReflectionMode.Skybox;
             RenderSettings.reflectionIntensity = 0.6f;
-            Sun(SpaceSunDirection, new Color(1f, 0.87f, 0.74f), 1.7f);
+            Sun(SpaceSunDirection, new Color(1f, 0.87f, 0.74f), 2.1f);
 
             var world = new GameObject("World").transform;
             BuildDeadStar(world);
-            BuildVerdanceFromOrbit(world);
+            var verdance = BuildVerdanceFromOrbit(world);
             BuildRelayStation(world);
             BuildAsteroidField(world);
 
@@ -53,6 +53,7 @@ namespace Driftlight.EditorTools
             var cam = MainCamera(new Vector3(0f, 3.4f, -13f), Quaternion.identity, 12000f);
             cam.gameObject.AddComponent<ChaseCamera>().target = ship.GetComponent<ShipController>();
             BuildSpaceDust(cam.transform);
+            var streaks = BuildWarpStreaks(cam.transform);
             BuildStarfield(GalaxyBandNormal);
 
             GlobalVolume(SpaceProfile());
@@ -63,6 +64,13 @@ namespace Driftlight.EditorTools
             encounter.dronePrefab = combat.drone;
             encounter.warpInEffect = combat.warpIn;
             new GameObject("HUD").AddComponent<Hud>();
+
+            // The warp drive lives on the ship prefab; scene objects are wired up on this instance.
+            var warp = ship.GetComponent<WarpDrive>();
+            warp.destinationMarker = verdance;
+            warp.streaks = streaks;
+            warp.unlockAfter = encounter;
+            PrefabUtility.RecordPrefabInstancePropertyModifications(warp);
 
             SaveScene(scene, SpaceScenePath, 0);
         }
@@ -108,6 +116,10 @@ namespace Driftlight.EditorTools
 
             root.AddComponent<PlayerShipDamage>().explosionPrefab = combat.bigExplosion;
 
+            var warp = root.AddComponent<WarpDrive>();
+            warp.destinationScene = "Verdance";
+            warp.destinationName = "VERDANCE";
+
             return SavePrefab(root, "Player Ship");
         }
 
@@ -124,7 +136,7 @@ namespace Driftlight.EditorTools
             corona.AddComponent<Billboard>();
         }
 
-        static void BuildVerdanceFromOrbit(Transform world)
+        static Transform BuildVerdanceFromOrbit(Transform world)
         {
             var (albedo, glow) = VerdanceOrbitTextures();
             var surface = Lit("Verdance Surface", Color.white, 0.25f, 0f, new Color(1.7f, 1.7f, 1.7f), albedo, glow);
@@ -141,6 +153,37 @@ namespace Driftlight.EditorTools
             var moon = MeshPart("Moon", HiResSphere(), world, VerdanceOrbitPosition + new Vector3(-780f, 260f, -420f), Vector3.zero,
                 Vector3.one * 110f, Lit("Moon Rock", new Color(0.42f, 0.4f, 0.43f), 0.1f));
             moon.GetComponent<Renderer>().shadowCastingMode = ShadowCastingMode.Off;
+            return planet;
+        }
+
+        static ParticleSystem BuildWarpStreaks(Transform camera)
+        {
+            var go = Empty("Warp Streaks", camera, Vector3.zero);
+            var ps = go.AddComponent<ParticleSystem>();
+            var main = ps.main;
+            main.loop = true;
+            main.playOnAwake = true;
+            main.startLifetime = 0.6f;
+            main.startSpeed = 0f;
+            main.startSize = 0.3f;
+            main.maxParticles = 1500;
+            main.simulationSpace = ParticleSystemSimulationSpace.Local;
+            var emission = ps.emission;
+            emission.rateOverTime = 0f;
+            var shape = ps.shape;
+            shape.enabled = false;
+            var colour = ps.colorOverLifetime;
+            colour.enabled = true;
+            colour.color = FadeInOut();
+
+            var renderer = go.GetComponent<ParticleSystemRenderer>();
+            renderer.sharedMaterial = Additive("Warp Streaks", new Color(1.2f, 1.9f, 3.2f, 1f), GlowTexture());
+            renderer.renderMode = ParticleSystemRenderMode.Stretch;
+            renderer.velocityScale = 0.06f;
+            renderer.lengthScale = 2f;
+            renderer.shadowCastingMode = ShadowCastingMode.Off;
+            renderer.receiveShadows = false;
+            return ps;
         }
 
         static Texture2D SpaceSkyTexture()
@@ -410,10 +453,10 @@ namespace Driftlight.EditorTools
             bloom.highQualityFiltering.value = true;
             profile.Add<Tonemapping>(true).mode.value = TonemappingMode.ACES;
             var vignette = profile.Add<Vignette>(true);
-            vignette.intensity.value = 0.3f;
+            vignette.intensity.value = 0.24f;
             vignette.smoothness.value = 0.45f;
             var colour = profile.Add<ColorAdjustments>(true);
-            colour.postExposure.value = 0.25f;
+            colour.postExposure.value = 0.6f;
             colour.contrast.value = 10f;
             colour.saturation.value = 8f;
             profile.Add<ChromaticAberration>(true).intensity.value = 0.06f;

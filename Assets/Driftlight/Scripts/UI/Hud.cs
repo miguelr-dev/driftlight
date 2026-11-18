@@ -21,7 +21,10 @@ namespace Driftlight
 
         [TextArea(3, 12)]
         public string controlsText =
-            "MOUSE  steer\nLEFT CLICK  fire\nW / S  thrust / brake\nA / D  strafe\nQ / E  roll\nSPACE / CTRL  up / down\nSHIFT  boost\nESC  free the mouse";
+            "MOUSE  steer\nLEFT CLICK  fire\nW / S  thrust / brake\nA / D  strafe\nQ / E  roll\nSPACE / CTRL  up / down\nSHIFT  boost\nHOLD F  warp (when unlocked)\nESC  free the mouse";
+        [TextArea(3, 12)]
+        public string footControlsText =
+            "MOUSE  look\nW A S D  move\nSHIFT  sprint\nSPACE  jump\nE  interact\nESC  free the mouse";
         public float controlsHintSeconds = 14f;
 
         Font font;
@@ -51,6 +54,25 @@ namespace Driftlight
         Color damageFlashColor;
         readonly System.Collections.Generic.List<RectTransform> enemyMarkers = new System.Collections.Generic.List<RectTransform>();
 
+        // Warp section
+        RectTransform warpGroup;
+        Text warpPrompt;
+        Image warpFill;
+        WarpDrive warpDrive;
+
+        // On-foot section
+        RectTransform footGroup;
+        Text footControlsHint;
+        Text fragmentsText;
+        Text promptText;
+        PlayerFootController footPlayer;
+
+        // Lore panel
+        CanvasGroup lorePanel;
+        Text loreTitle;
+        Text loreBody;
+        float loreTimer;
+
         // Messages (all scenes)
         Text objectiveLabel;
         Text objectiveText;
@@ -78,6 +100,9 @@ namespace Driftlight
             BuildMessages();
             BuildFlightHud();
             BuildCombatHud();
+            BuildWarpHud();
+            BuildFootHud();
+            BuildLorePanel();
             hintTimer = controlsHintSeconds;
         }
 
@@ -91,9 +116,102 @@ namespace Driftlight
             if (!ship) ship = ShipController.Player;
             if (ship && !shipInput) shipInput = ship.GetComponent<ShipPlayerInput>();
             if (ship && !shipHealth) shipHealth = ship.GetComponent<Health>();
+            if (ship && !warpDrive) warpDrive = ship.GetComponent<WarpDrive>();
+            if (!footPlayer) footPlayer = PlayerFootController.Player;
             UpdateMessages();
             UpdateFlightHud();
             UpdateCombatHud();
+            UpdateWarpHud();
+            UpdateFootHud();
+            UpdateLorePanel();
+        }
+
+        /// <summary>Shows an interaction prompt under the crosshair (null hides it).</summary>
+        public void SetPrompt(string text)
+        {
+            promptText.text = text ?? "";
+        }
+
+        /// <summary>Shows a log from the vanished people in a panel at the bottom of the screen.</summary>
+        public void ShowLore(string title, string body, float seconds)
+        {
+            loreTitle.text = Spaced(title ?? "");
+            loreBody.text = body ?? "";
+            loreTimer = seconds;
+        }
+
+        // ------------------------------------------------------------------ warp
+
+        void BuildWarpHud()
+        {
+            warpGroup = Rect("Warp", flightGroup, new Vector2(0.5f, 0f), new Vector2(0f, 70f), new Vector2(520f, 70f));
+            warpPrompt = Label("Warp Prompt", warpGroup, new Vector2(0.5f, 1f), Vector2.zero, new Vector2(520f, 30f), 20, TextAnchor.UpperCenter, Accent);
+            var background = Box("Warp Bar", warpGroup, new Vector2(0.5f, 0f), new Vector2(0f, 10f), new Vector2(420f, 8f), PanelColor);
+            warpFill = Box("Fill", background.rectTransform, Vector2.zero, Vector2.zero, Vector2.zero, new Color(0.75f, 0.95f, 1f, 1f));
+            var fillRect = warpFill.rectTransform;
+            fillRect.anchorMin = Vector2.zero;
+            fillRect.anchorMax = Vector2.one;
+            fillRect.sizeDelta = Vector2.zero;
+            warpGroup.gameObject.SetActive(false);
+        }
+
+        void UpdateWarpHud()
+        {
+            bool show = ship && warpDrive && warpDrive.Unlocked && !warpDrive.Engaged;
+            if (warpGroup.gameObject.activeSelf != show) warpGroup.gameObject.SetActive(show);
+            if (!show) return;
+            warpPrompt.text = warpDrive.Charge01 > 0.01f
+                ? Spaced("CHARGING WARP DRIVE")
+                : $"HOLD  [F]  TO WARP   -   {warpDrive.destinationName}";
+            SetBar(warpFill, warpDrive.Charge01);
+            float pulse = 0.75f + 0.25f * Mathf.Sin(Time.time * 4f);
+            warpPrompt.color = new Color(Accent.r, Accent.g, Accent.b, warpDrive.Charge01 > 0.01f ? 1f : pulse);
+        }
+
+        // ------------------------------------------------------------------ on foot
+
+        void BuildFootHud()
+        {
+            footGroup = Group("On Foot");
+            Box("Dot", footGroup, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(5f, 5f), new Color(1f, 1f, 1f, 0.85f));
+            promptText = Label("Prompt", footGroup, new Vector2(0.5f, 0.5f), new Vector2(0f, -70f), new Vector2(900f, 40f), 26, TextAnchor.MiddleCenter, Accent);
+            Label("Fragments Label", footGroup, new Vector2(1f, 0f), new Vector2(-60f, 100f), new Vector2(400f, 24f), 18, TextAnchor.LowerRight, AccentDim).text = "SIGNAL FRAGMENTS";
+            fragmentsText = Label("Fragments", footGroup, new Vector2(1f, 0f), new Vector2(-60f, 50f), new Vector2(400f, 56f), 46, TextAnchor.LowerRight, Violet);
+            footControlsHint = Label("Controls", footGroup, new Vector2(1f, 1f), new Vector2(-60f, -60f), new Vector2(420f, 220f), 18, TextAnchor.UpperRight, new Color(1f, 1f, 1f, 0.8f));
+            footControlsHint.text = footControlsText;
+            footGroup.gameObject.SetActive(false);
+        }
+
+        void UpdateFootHud()
+        {
+            bool show = footPlayer != null && ship == null;
+            if (footGroup.gameObject.activeSelf != show) footGroup.gameObject.SetActive(show);
+            if (!show) return;
+            fragmentsText.text = $"{GameState.FragmentsFound} / {GameState.TotalFragments}";
+            footControlsHint.color = new Color(1f, 1f, 1f, Mathf.Clamp01(hintTimer / 2f) * 0.8f);
+            hintTimer -= Time.deltaTime;
+        }
+
+        // ------------------------------------------------------------------ lore panel
+
+        void BuildLorePanel()
+        {
+            var panel = Box("Lore Panel", root, new Vector2(0.5f, 0f), new Vector2(0f, 150f), new Vector2(980f, 250f), new Color(0.02f, 0.04f, 0.07f, 0.78f));
+            lorePanel = panel.gameObject.AddComponent<CanvasGroup>();
+            lorePanel.alpha = 0f;
+            lorePanel.blocksRaycasts = false;
+            Box("Accent", panel.rectTransform, new Vector2(0f, 1f), Vector2.zero, new Vector2(980f, 3f), Violet);
+            loreTitle = Label("Title", panel.rectTransform, new Vector2(0.5f, 1f), new Vector2(0f, -22f), new Vector2(920f, 34f), 22, TextAnchor.UpperCenter, Violet);
+            loreBody = Label("Body", panel.rectTransform, new Vector2(0.5f, 1f), new Vector2(0f, -66f), new Vector2(900f, 170f), 23, TextAnchor.UpperCenter, Color.white);
+            loreBody.fontStyle = FontStyle.Italic;
+            loreBody.lineSpacing = 1.15f;
+        }
+
+        void UpdateLorePanel()
+        {
+            float target = loreTimer > 0f ? 1f : 0f;
+            loreTimer -= Time.deltaTime;
+            lorePanel.alpha = Mathf.MoveTowards(lorePanel.alpha, target, Time.deltaTime * 1.5f);
         }
 
         // ------------------------------------------------------------------ public API
