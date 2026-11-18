@@ -1,29 +1,19 @@
-# HUD and menu mockups
+# Mockups
 
-First pass at how DRIFTLIGHT's screens could look, so the UI has one shared style before we build it in Unity. Open [`hud.html`](hud.html) in a browser for the full-size version.
+Quick visual mockups so the game has one shared style before we build it in Unity. Open the HTML files in a browser for full size. The style rules and concept art are in [`../art-direction.md`](../art-direction.md).
+
+## HUD and menus: [`hud.html`](hud.html)
 
 ![HUD and menu mockups](hud-preview.png)
 
-## Screens
+1. **Ship HUD:** shield icon and bars top left, amber radar top right, red lock-on in the middle. The ship side is Miguel's call; it's here so both HUDs match.
+2. **On-foot HUD:** same corners, plus the planet's meter (cold on Glacius), the fragment counter and the tool bar.
+3. **Main menu**, 4. **Upgrade shop**, 5. **Star map** (the dashed circle is your warp range).
 
-1. **On-foot HUD:** suit and shield bars, salvage and fragment count, signal direction, scanner readout, tool bar (blaster, scanner, grapple, jetpack) and blaster heat.
-2. **Ship HUD:** hull, shields, boost, warp charge, current weapon and wave count. Only here so both HUDs match; the ship side is Miguel's call.
-3. **Main menu:** title, menu and the save summary.
-4. **Upgrade shop:** ship and tools tabs, upgrade levels, salvage costs and what an upgrade changes.
-5. **Star map:** the 8 planets on their orbits. The dashed circle is your warp range; planets outside it are locked.
+## Planet looks: [`planets.html`](planets.html)
 
-## Style
+![Planet looks](planets-preview.png)
 
-| Colour | Hex | Used for |
-|---|---|---|
-| Cyan | `#5fe3ff` | Friendly UI, shields, selection, crosshair |
-| Red | `#ff5a6e` | Hull, health, enemies, can't afford |
-| Amber | `#ffc857` | Salvage and upgrades |
-| Violet | `#c58bff` | The signal and story fragments |
-| Panel | `#0c1424` at 72% opacity | HUD panels, with a thin cyan border |
+One card per planet: its colours, what it looks like, how to build it simply, and its HUD meter.
 
-- **Fonts:** a clean sans for names and descriptions, and a monospace for numbers and readouts.
-- **Labels:** small, uppercase and widely spaced.
-- **Layout:** status at the top, health on the left, tools and weapon at the bottom, so it's easy to read at a glance.
-
-These are mockups, not final art. They will change once we build them and playtest.
+These are mockups, not final art. They'll change once we build and playtest.

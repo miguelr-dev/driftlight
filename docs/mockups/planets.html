@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DRIFTLIGHT Planet Looks</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,400;0,600;0,800;1,800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+  .grid { max-width: 1120px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 28px; }
+  .planet-card h3 { margin: 12px 0 2px; font-size: 20px; font-weight: 800; font-style: italic; }
+  .planet-card h3 small { font-size: 12px; font-style: normal; font-weight: 600; letter-spacing: 0.14em; color: var(--dim); margin-left: 8px; text-transform: uppercase; }
+  .planet-card p { margin: 4px 0; color: var(--dim); font-size: 14px; }
+  .planet-card p b { color: var(--text); font-weight: 600; }
+  .swatches { display: flex; gap: 6px; margin: 8px 0; }
+  .swatches span { flex: 1; height: 22px; border-radius: 3px; position: relative; }
+  .swatches span::after { content: attr(data-hex); position: absolute; left: 0; right: 0; top: 26px; font-size: 10px; color: var(--dim); text-align: center; }
+  .swatches { margin-bottom: 26px; }
+  .scene .ground { position: absolute; left: 0; right: 0; bottom: 0; height: 40%; }
+  .scene .glow { position: absolute; border-radius: 50%; filter: blur(6px); }
+  .scene .meter { position: absolute; left: 4%; bottom: 7%; font-size: 0.85em; }
+  .scene .meter .bar { width: 9em; transform: none; height: 0.6em; margin-top: 0.3em; border: 1px solid rgba(255,255,255,0.3); }
+  .scene .name { position: absolute; right: 4%; bottom: 7%; font-weight: 800; font-style: italic; font-size: 1.6em; color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.4); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">DRIFTLIGHT</div>
+  <p>One look per planet. Each planet gets one main colour, one glow colour and one HUD meter for its mechanic. Built from simple shapes, coloured fog and glowing materials, not detailed models.</p>
+</header>
+
+<div class="grid" id="grid"></div>
+
+<script>
+const planets = [
+  { n: 1, name: "Verdance", tag: "Tutorial", sky: "linear-gradient(180deg,#06141c,#0c2f2a 55%,#0f3d2a)", ground: "linear-gradient(180deg,#0f3a26,#06180f)",
+    glows: [["#3fe0a0", 18, 62, 10], ["#5fe3ff", 70, 70, 8], ["#9dff6a", 42, 74, 6]], meter: null,
+    pal: ["#06141c", "#0f3d2a", "#3fe0a0", "#5fe3ff"],
+    look: "Dark jungle at dusk. Giant mushrooms and vines that glow from inside.", build: "Green fog, a dark sky, cones and spheres with glowing tips.", enemy: "Spore drones: floating balls with a glowing red core." },
+  { n: 2, name: "Cinder", tag: "Eruptions", sky: "linear-gradient(180deg,#1a1210,#3b2118 60%,#5a2a16)", ground: "linear-gradient(180deg,#1b1414,#0b0808)",
+    glows: [["#ff7a3d", 30, 82, 14], ["#ffb347", 66, 86, 10], ["#ff4d1a", 50, 50, 5]], meter: ["Eruption", "#ff7a3d", 70],
+    pal: ["#1b1414", "#3b2118", "#ff7a3d", "#ffb347"],
+    look: "Black rock, rivers of lava, falling ash.", build: "Black rocks, flat glowing orange planes for lava, ash particles, orange fog.", enemy: "Magma crawlers: low, wide, glowing cracks." },
+  { n: 3, name: "Glacius", tag: "Cold meter", sky: "linear-gradient(180deg,#2a2357,#4a3f8f 40%,#6d78c4)", ground: "linear-gradient(180deg,#c9dcf7,#8ea8d8)",
+    glows: [["#b77cff", 30, 12, 22], ["#7fe0ff", 64, 10, 18], ["#5fe3ff", 50, 66, 5]], meter: ["Cold Meter", "#7fd0ff", 38],
+    pal: ["#2a2357", "#6d78c4", "#8fd3ff", "#b77cff"],
+    look: "Ice canyons under a violet aurora, with ruins frozen in the distance.", build: "Stretched blue see-through cubes for ice, two big glowing aurora planes, snow particles.", enemy: "Ice stalkers: pale and thin, with cyan eyes." },
+  { n: 4, name: "Mirage", tag: "Sandstorms", sky: "linear-gradient(180deg,#5a3a24,#b9783e 55%,#e2a85e)", ground: "linear-gradient(180deg,#c99355,#7a5330)",
+    glows: [["#ffe0a3", 72, 22, 14], ["#b77cff", 34, 66, 5]], meter: ["Visibility", "#e8b86a", 45],
+    pal: ["#5a3a24", "#b9783e", "#e2a85e", "#ffe0a3"],
+    look: "Desert ruins in heat haze. Storms roll in and hide everything.", build: "Broken cubes for ruins, thick sand-coloured fog that you raise for storms.", enemy: "Sand wraiths: dark cloth shapes that fade in and out." },
+  { n: 5, name: "Abyssa", tag: "Jetpack", sky: "linear-gradient(180deg,#0d1b3d,#2c4f8f 50%,#e08ab3)", ground: "linear-gradient(180deg,#0a3a66,#041a33)",
+    glows: [["#4fb6ff", 30, 56, 12], ["#ff9ad1", 72, 30, 10], ["#5fe3ff", 55, 72, 6]], meter: ["Jetpack fuel", "#4fb6ff", 60],
+    pal: ["#0d1b3d", "#2c4f8f", "#4fb6ff", "#ff9ad1"],
+    look: "Floating islands over an endless ocean at sunset.", build: "Flattened rocks as islands, a big water plane far below, pink sky.", enemy: "Sky eels: long, glowing shapes that loop between islands." },
+  { n: 6, name: "Prism", tag: "Stretch", sky: "linear-gradient(180deg,#151827,#2b3050 60%,#3b3f66)", ground: "linear-gradient(180deg,#d9e1ff,#8e97c8)",
+    glows: [["#ffffff", 50, 50, 10], ["#ff6ad5", 30, 60, 6], ["#6affd8", 70, 60, 6]], meter: ["Light beam", "#ffffff", 50],
+    pal: ["#151827", "#3b3f66", "#d9e1ff", "#ff6ad5"],
+    look: "A planet of crystal. Light splits into colours when it hits them.", build: "Stretched glass shards, Line Renderer beams for the puzzles.", enemy: "Crystal sentinels: shard bodies with a white core." },
+  { n: 7, name: "Hollow", tag: "Stretch", sky: "linear-gradient(180deg,#020305,#080a0e 70%,#101318)", ground: "linear-gradient(180deg,#1a1d22,#08090b)",
+    glows: [["#d9e6ff", 44, 62, 16], ["#ff4d5e", 76, 40, 3], ["#ff4d5e", 80, 42, 3]], meter: ["Flashlight", "#d9e6ff", 80],
+    pal: ["#020305", "#1a1d22", "#d9e6ff", "#ff4d5e"],
+    look: "Dead moon covered in broken ships. Pitch black.", build: "No lights except your flashlight (a spotlight on the camera). Wrecks are scaled cubes.", enemy: "A hijacked ship AI: only red lights in the dark." },
+  { n: 8, name: "The Source", tag: "Finale", sky: "radial-gradient(circle at 50% 40%,#3a1f5c,#120a1f 50%,#040208)", ground: "linear-gradient(180deg,#120a1f,#040208)",
+    glows: [["#b77cff", 50, 38, 18], ["#ffffff", 50, 38, 5]], meter: null,
+    pal: ["#040208", "#120a1f", "#b77cff", "#ffffff"],
+    look: "The heart of the signal: a dark void lit by one violet star.", build: "Black skybox, one bright violet emissive sphere, the boss arena floating in space.", enemy: "???" },
+];
+
+const grid = document.getElementById("grid");
+for (const p of planets) {
+  const glows = p.glows.map(([c, x, y, s]) =>
+    `<div class="glow" style="left:${x}%;top:${y}%;width:${s}%;aspect-ratio:1;background:${c};box-shadow:0 0 30px 10px ${c};opacity:.8;transform:translate(-50%,-50%)"></div>`).join("");
+  const meter = p.meter ? `<div class="meter">${p.meter[0]}<div class="bar" style="background:rgba(255,255,255,.1)"><i style="width:${p.meter[2]}%;background:${p.meter[1]};box-shadow:0 0 8px ${p.meter[1]}"></i></div></div>` : "";
+  grid.insertAdjacentHTML("beforeend", `
+    <div class="planet-card">
+      <div class="screen scene" style="background:${p.sky}">
+        <div class="ground" style="background:${p.ground};clip-path:polygon(0 25%,20% 10%,45% 30%,70% 5%,100% 20%,100% 100%,0 100%)"></div>
+        ${glows}${meter}<div class="name">${p.name}</div>
+      </div>
+      <h3>${p.n}. ${p.name}<small>${p.tag}</small></h3>
+      <div class="swatches">${p.pal.map(h => `<span style="background:${h}" data-hex="${h}"></span>`).join("")}</div>
+      <p><b>Look:</b> ${p.look}</p>
+      <p><b>Build it with:</b> ${p.build}</p>
+      <p><b>Enemies:</b> ${p.enemy}</p>
+    </div>`);
+}
+</script>
+</body>
+</html>
