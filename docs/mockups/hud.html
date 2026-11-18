@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DRIFTLIGHT HUD Mockups</title>
+<style>
+  :root {
+    --bg: #05070d;
+    --space: #0a0f1c;
+    --panel: rgba(12, 20, 36, 0.72);
+    --line: rgba(120, 220, 255, 0.28);
+    --text: #dff6ff;
+    --dim: #7f97a8;
+    --accent: #5fe3ff;   /* driftlight cyan: friendly UI, shields */
+    --salvage: #ffc857;  /* salvage, currency, upgrades */
+    --danger: #ff5a6e;   /* hull, health, enemies */
+    --signal: #c58bff;   /* story: signal fragments */
+    --locked: #3a4756;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 14px/1.4 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    padding: 32px 16px 64px;
+  }
+  .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; letter-spacing: 0.04em; }
+  header, section { max-width: 1120px; margin: 0 auto; }
+  header h1 { font-size: 28px; letter-spacing: 0.3em; margin: 0 0 4px; color: var(--accent); }
+  header p { margin: 0 0 16px; color: var(--dim); }
+  section { margin-bottom: 48px; }
+  section h2 { font-size: 13px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--dim); margin: 0 0 10px; font-weight: 600; }
+
+  /* 16:9 game frame */
+  .screen {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    width: 100%;
+    overflow: hidden;
+    border: 1px solid #1a2433;
+    border-radius: 6px;
+    background: radial-gradient(ellipse at 30% 20%, #142238 0%, var(--space) 55%, #04060b 100%);
+    font-size: clamp(9px, 1.25vw, 14px);
+  }
+  .stars::before {
+    content: ""; position: absolute; inset: 0; opacity: 0.6;
+    background-image:
+      radial-gradient(1px 1px at 12% 18%, #fff, transparent),
+      radial-gradient(1px 1px at 72% 12%, #fff, transparent),
+      radial-gradient(1px 1px at 44% 66%, #cfe, transparent),
+      radial-gradient(1px 1px at 88% 52%, #fff, transparent),
+      radial-gradient(1px 1px at 22% 82%, #def, transparent),
+      radial-gradient(1px 1px at 60% 40%, #fff, transparent),
+      radial-gradient(1px 1px at 5% 50%, #fff, transparent),
+      radial-gradient(1px 1px at 95% 88%, #cfe, transparent);
+  }
+  .jungle { background: linear-gradient(180deg, #0b1a24 0%, #0f2a22 55%, #0a1f14 100%); }
+  .jungle::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 38%;
+    background: radial-gradient(ellipse at 20% 100%, rgba(90, 255, 170, 0.18), transparent 60%),
+                radial-gradient(ellipse at 75% 100%, rgba(95, 227, 255, 0.14), transparent 55%);
+  }
+
+  .panel {
+    position: absolute;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 0.7em 0.9em;
+    backdrop-filter: blur(4px);
+  }
+  .label { font-size: 0.75em; letter-spacing: 0.18em; text-transform: uppercase; color: var(--dim); }
+  .bar { height: 0.55em; background: rgba(255,255,255,0.08); border-radius: 2px; margin: 0.3em 0 0.6em; overflow: hidden; }
+  .bar > i { display: block; height: 100%; border-radius: 2px; }
+  .fill-accent { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+  .fill-danger { background: var(--danger); box-shadow: 0 0 8px var(--danger); }
+  .fill-salvage { background: var(--salvage); box-shadow: 0 0 8px var(--salvage); }
+  .salvage { color: var(--salvage); }
+  .signal { color: var(--signal); }
+
+  /* crosshair */
+  .crosshair { position: absolute; left: 50%; top: 50%; width: 2.2em; height: 2.2em; transform: translate(-50%, -50%); }
+  .crosshair::before, .crosshair::after { content: ""; position: absolute; background: var(--accent); box-shadow: 0 0 6px var(--accent); }
+  .crosshair::before { left: 50%; top: 0; bottom: 0; width: 2px; transform: translateX(-50%); clip-path: polygon(0 0,100% 0,100% 35%,0 35%,0 65%,100% 65%,100% 100%,0 100%); }
+  .crosshair::after { top: 50%; left: 0; right: 0; height: 2px; transform: translateY(-50%); clip-path: polygon(0 0,35% 0,35% 100%,0 100%,0 0,65% 0,100% 0,100% 100%,65% 100%); }
+  .reticle { position: absolute; left: 50%; top: 50%; width: 7em; height: 7em; transform: translate(-50%, -50%); border: 1px solid var(--line); border-radius: 50%; }
+
+  /* tool wheel */
+  .tools { display: flex; gap: 0.5em; }
+  .tool { width: 4.6em; text-align: center; padding: 0.5em 0.2em; border: 1px solid var(--line); border-radius: 4px; background: var(--panel); }
+  .tool b { display: block; font-size: 1.4em; line-height: 1.2; }
+  .tool span { font-size: 0.7em; letter-spacing: 0.12em; color: var(--dim); text-transform: uppercase; }
+  .tool.active { border-color: var(--accent); box-shadow: 0 0 10px rgba(95,227,255,0.35); }
+  .tool.active span { color: var(--accent); }
+  .tool.locked { opacity: 0.35; }
+  .key { font-size: 0.7em; color: var(--dim); }
+
+  /* scan target */
+  .scan-box { position: absolute; border: 1px dashed var(--accent); border-radius: 2px; }
+  .scan-box::before { content: ""; position: absolute; inset: 20%; border-radius: 50%; background: radial-gradient(circle, rgba(255,90,110,0.55), transparent 70%); }
+
+  /* menu */
+  .menu { position: absolute; left: 8%; top: 50%; transform: translateY(-50%); }
+  .logo { font-size: 3.6em; letter-spacing: 0.35em; font-weight: 300; color: var(--accent); text-shadow: 0 0 18px rgba(95,227,255,0.5); margin-bottom: 0.2em; }
+  .tagline { color: var(--dim); margin-bottom: 2.2em; letter-spacing: 0.1em; }
+  .menu ul { list-style: none; margin: 0; padding: 0; }
+  .menu li { font-size: 1.3em; letter-spacing: 0.2em; padding: 0.35em 0; color: var(--dim); }
+  .menu li.sel { color: var(--text); }
+  .menu li.sel::before { content: "▸ "; color: var(--accent); }
+  .star-glow { position: absolute; right: 12%; top: 50%; width: 22em; height: 22em; transform: translateY(-50%); border-radius: 50%;
+    background: radial-gradient(circle, rgba(197,139,255,0.35) 0%, rgba(95,227,255,0.1) 40%, transparent 70%); }
+  .star-core { position: absolute; right: calc(12% + 10em); top: 50%; width: 2em; height: 2em; transform: translateY(-50%); border-radius: 50%; background: #fff; box-shadow: 0 0 30px 10px var(--signal); }
+
+  /* shop */
+  .shop { position: absolute; inset: 6% 6%; display: grid; grid-template-columns: 1fr 1fr; gap: 1.2em; }
+  .shop .panel { position: static; }
+  .tabs { display: flex; gap: 1.5em; margin-bottom: 0.8em; }
+  .tabs span { letter-spacing: 0.15em; text-transform: uppercase; color: var(--dim); padding-bottom: 0.2em; }
+  .tabs span.on { color: var(--accent); border-bottom: 2px solid var(--accent); }
+  .row { display: grid; grid-template-columns: 1fr auto auto; gap: 1em; align-items: center; padding: 0.55em 0; border-bottom: 1px solid rgba(120,220,255,0.1); }
+  .pips { display: flex; gap: 3px; }
+  .pips i { width: 0.9em; height: 0.45em; background: var(--locked); border-radius: 1px; }
+  .pips i.on { background: var(--accent); }
+  .cost { min-width: 4.5em; text-align: right; }
+  .row.cant .cost { color: var(--danger); }
+  .row.maxed .cost { color: var(--dim); }
+
+  /* star map */
+  .orbit { position: absolute; left: 50%; top: 50%; border: 1px solid rgba(120,220,255,0.12); border-radius: 50%; transform: translate(-50%, -50%); }
+  .range { position: absolute; left: 50%; top: 50%; border: 1px dashed var(--accent); border-radius: 50%; transform: translate(-50%, -50%); background: rgba(95,227,255,0.04); }
+  .sun { position: absolute; left: 50%; top: 50%; width: 1.6em; height: 1.6em; transform: translate(-50%, -50%); border-radius: 50%; background: #3b2a4a; box-shadow: 0 0 20px 4px rgba(197,139,255,0.35); }
+  .planet { position: absolute; transform: translate(-50%, -50%); text-align: center; }
+  .planet i { display: block; margin: 0 auto 0.3em; border-radius: 50%; }
+  .planet span { font-size: 0.8em; letter-spacing: 0.12em; text-transform: uppercase; white-space: nowrap; }
+  .planet.locked i { background: var(--locked) !important; box-shadow: none !important; }
+  .planet.locked span { color: var(--locked); }
+  .planet.here span { color: var(--accent); }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 0.5em 1.5em; margin: 0 0 32px; color: var(--dim); font-size: 13px; }
+  .legend b { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>DRIFTLIGHT</h1>
+  <p>HUD and menu mockups. A shared look for every screen, to match in Unity.</p>
+  <div class="legend">
+    <span><b style="background:var(--accent)"></b>Cyan: friendly UI, shields, selection</span>
+    <span><b style="background:var(--danger)"></b>Red: hull, health, enemies</span>
+    <span><b style="background:var(--salvage)"></b>Amber: salvage and upgrades</span>
+    <span><b style="background:var(--signal)"></b>Violet: the signal and story</span>
+  </div>
+</header>
+
+<!-- 1. On-foot HUD -->
+<section>
+  <h2>1 · On-foot HUD (planet surface)</h2>
+  <div class="screen jungle">
+    <div class="reticle"></div>
+    <div class="crosshair"></div>
+
+    <div class="panel" style="left:3%; top:5%; width:24%;">
+      <div class="label">Suit</div>
+      <div class="bar"><i class="fill-danger" style="width:72%"></i></div>
+      <div class="label">Shield</div>
+      <div class="bar" style="margin-bottom:0"><i class="fill-accent" style="width:45%"></i></div>
+    </div>
+
+    <div class="panel mono" style="right:3%; top:5%; text-align:right;">
+      <div class="salvage" style="font-size:1.3em">⬡ 1,240</div>
+      <div class="signal" style="font-size:0.85em; margin-top:0.2em">◈ FRAGMENT 0 / 1</div>
+    </div>
+
+    <div class="panel mono" style="left:50%; top:5%; transform:translateX(-50%); text-align:center;">
+      <div class="label">Verdance</div>
+      <div style="font-size:0.9em; margin-top:0.2em">SIGNAL ▸ 340m NE</div>
+    </div>
+
+    <div class="scan-box" style="left:66%; top:38%; width:9%; height:16%;"></div>
+    <div class="panel" style="left:76.5%; top:36%; width:19%;">
+      <div class="label" style="color:var(--accent)">Scan</div>
+      <div style="font-weight:600; margin:0.2em 0">Spore Drone</div>
+      <div class="mono" style="font-size:0.85em; color:var(--dim)">THREAT LOW<br>WEAK POINT: CORE</div>
+    </div>
+
+    <div style="position:absolute; left:50%; bottom:5%; transform:translateX(-50%);">
+      <div class="tools">
+        <div class="tool active"><b>⌁</b><span>Blaster</span><div class="key">1</div></div>
+        <div class="tool"><b>◎</b><span>Scanner</span><div class="key">2</div></div>
+        <div class="tool locked"><b>⟟</b><span>Grapple</span><div class="key">3</div></div>
+        <div class="tool locked"><b>⇡</b><span>Jetpack</span><div class="key">4</div></div>
+      </div>
+    </div>
+
+    <div class="panel mono" style="right:3%; bottom:5%; text-align:right;">
+      <div class="label">Blaster</div>
+      <div style="font-size:1.6em">∞</div>
+      <div class="bar" style="width:8em; margin-bottom:0"><i class="fill-accent" style="width:80%"></i></div>
+      <div class="key">HEAT</div>
+    </div>
+  </div>
+</section>
+
+<!-- 2. Ship HUD -->
+<section>
+  <h2>2 · Ship HUD (orbit), for a shared look; Miguel's call</h2>
+  <div class="screen stars">
+    <div class="reticle" style="width:9em; height:9em;"></div>
+    <div class="crosshair"></div>
+
+    <div class="scan-box" style="left:58%; top:30%; width:5%; height:9%; border-color:var(--danger);"></div>
+    <div class="mono" style="position:absolute; left:58%; top:40.5%; font-size:0.75em; color:var(--danger);">DRONE 420m</div>
+
+    <div class="panel" style="left:3%; bottom:5%; width:24%;">
+      <div class="label">Hull</div>
+      <div class="bar"><i class="fill-danger" style="width:88%"></i></div>
+      <div class="label">Shields</div>
+      <div class="bar"><i class="fill-accent" style="width:62%"></i></div>
+      <div class="label">Boost</div>
+      <div class="bar" style="margin-bottom:0"><i class="fill-salvage" style="width:100%"></i></div>
+    </div>
+
+    <div class="panel mono" style="right:3%; bottom:5%; text-align:right;">
+      <div class="label">Weapon</div>
+      <div style="font-size:1.2em; margin:0.2em 0">BLASTERS</div>
+      <div class="key">Q ▸ MISSILES ×6</div>
+    </div>
+
+    <div class="panel mono" style="left:50%; bottom:5%; transform:translateX(-50%); text-align:center; width:26%;">
+      <div class="label">Warp drive</div>
+      <div class="bar"><i class="fill-accent" style="width:35%"></i></div>
+      <div style="font-size:0.8em; color:var(--dim)">CHARGING · HOLD W</div>
+    </div>
+
+    <div class="panel mono" style="right:3%; top:5%; text-align:right;">
+      <div class="label">Wave</div>
+      <div style="font-size:1.3em">2 / 3</div>
+      <div style="font-size:0.85em; color:var(--danger)">5 HOSTILES</div>
+    </div>
+  </div>
+</section>
+
+<!-- 3. Main menu -->
+<section>
+  <h2>3 · Main menu</h2>
+  <div class="screen stars">
+    <div class="star-glow"></div>
+    <div class="star-core"></div>
+    <div class="menu">
+      <div class="logo">DRIFTLIGHT</div>
+      <div class="tagline">Follow the signal.</div>
+      <ul>
+        <li class="sel">Continue</li>
+        <li>New game</li>
+        <li>Settings</li>
+        <li>Quit</li>
+      </ul>
+    </div>
+    <div class="mono" style="position:absolute; left:8%; bottom:5%; font-size:0.75em; color:var(--dim);">SAVE · VERDANCE · 1 / 8 FRAGMENTS</div>
+  </div>
+</section>
+
+<!-- 4. Upgrade shop -->
+<section>
+  <h2>4 · Upgrade shop</h2>
+  <div class="screen stars">
+    <div class="shop">
+      <div class="panel">
+        <div class="tabs"><span class="on">Ship</span><span>Tools</span></div>
+        <div class="row"><span>Hull</span><span class="pips"><i class="on"></i><i class="on"></i><i></i><i></i></span><span class="cost mono salvage">⬡ 400</span></div>
+        <div class="row"><span>Shields</span><span class="pips"><i class="on"></i><i></i><i></i><i></i></span><span class="cost mono salvage">⬡ 250</span></div>
+        <div class="row"><span>Weapons</span><span class="pips"><i class="on"></i><i></i><i></i></span><span class="cost mono salvage">⬡ 600</span></div>
+        <div class="row"><span>Boost</span><span class="pips"><i class="on"></i><i class="on"></i><i class="on"></i></span><span class="cost mono">MAX</span></div>
+        <div class="row cant" style="border:0"><span>Warp range</span><span class="pips"><i class="on"></i><i></i><i></i><i></i></span><span class="cost mono">⬡ 1,800</span></div>
+      </div>
+      <div class="panel">
+        <div class="label">Selected</div>
+        <div style="font-size:1.5em; font-weight:600; margin:0.2em 0 0.4em">Hull · Level 3</div>
+        <div style="color:var(--dim); margin-bottom:1em">Hull +25%. Take more hits before your ship goes down.</div>
+        <div class="label">Hull</div>
+        <div class="bar" style="position:relative"><i class="fill-danger" style="width:50%"></i></div>
+        <div class="mono" style="font-size:0.85em; color:var(--dim)">200 ▸ <span style="color:var(--text)">250</span></div>
+        <div style="position:absolute; right:calc(6% + 1.6em); bottom:calc(6% + 1.4em); text-align:right;">
+          <div class="mono salvage" style="font-size:1.2em">⬡ 1,240</div>
+          <div class="key">ENTER TO BUY</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 5. Star map -->
+<section>
+  <h2>5 · Star map (warp range decides what you can reach)</h2>
+  <div class="screen stars">
+    <div class="orbit" style="width:22%; aspect-ratio:1;"></div>
+    <div class="orbit" style="width:40%; aspect-ratio:1;"></div>
+    <div class="orbit" style="width:58%; aspect-ratio:1;"></div>
+    <div class="orbit" style="width:76%; aspect-ratio:1;"></div>
+    <div class="range" style="width:44%; aspect-ratio:1; left:40%; top:58%;"></div>
+    <div class="sun"></div>
+
+    <div class="planet here" style="left:40%; top:58%;"><i style="width:1.6em; height:1.6em; background:#3fe0a0; box-shadow:0 0 12px #3fe0a0;"></i><span>▸ Verdance</span></div>
+    <div class="planet" style="left:57%; top:72%;"><i style="width:1.4em; height:1.4em; background:#ff7a3d; box-shadow:0 0 12px #ff7a3d;"></i><span>Cinder</span></div>
+    <div class="planet locked" style="left:68%; top:28%;"><i style="width:1.5em; height:1.5em;"></i><span>Glacius</span></div>
+    <div class="planet locked" style="left:24%; top:30%;"><i style="width:1.5em; height:1.5em;"></i><span>Mirage</span></div>
+    <div class="planet locked" style="left:80%; top:62%;"><i style="width:1.7em; height:1.7em;"></i><span>Abyssa</span></div>
+    <div class="planet locked" style="left:16%; top:68%;"><i style="width:1.2em; height:1.2em;"></i><span>Prism</span></div>
+    <div class="planet locked" style="left:50%; top:12%;"><i style="width:1em; height:1em;"></i><span>Hollow</span></div>
+    <div class="planet locked" style="left:91%; top:20%;"><i style="width:1.3em; height:1.3em;"></i><span>The Source</span></div>
+
+    <div class="panel" style="right:3%; bottom:5%; width:24%;">
+      <div class="label">Cinder</div>
+      <div style="margin:0.3em 0; color:var(--dim)">Lava fields, ash skies.</div>
+      <div class="mono" style="font-size:0.85em">IN RANGE · <span class="signal">◈ 0 / 1</span></div>
+      <div class="key" style="margin-top:0.5em">ENTER TO WARP</div>
+    </div>
+    <div class="panel mono" style="left:3%; top:5%;">
+      <div class="label">Warp range</div>
+      <div style="font-size:1.1em">LEVEL 1</div>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>
