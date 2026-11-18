@@ -21,7 +21,7 @@ namespace Driftlight
 
         [TextArea(3, 12)]
         public string controlsText =
-            "MOUSE  steer\nW / S  thrust / brake\nA / D  strafe\nQ / E  roll\nSPACE / CTRL  up / down\nSHIFT  boost\nESC  free the mouse";
+            "MOUSE  steer\nLEFT CLICK  fire\nW / S  thrust / brake\nA / D  strafe\nQ / E  roll\nSPACE / CTRL  up / down\nSHIFT  boost\nESC  free the mouse";
         public float controlsHintSeconds = 14f;
 
         Font font;
@@ -37,6 +37,27 @@ namespace Driftlight
 
         ShipController ship;
         ShipPlayerInput shipInput;
+        Health shipHealth;
+
+        // Combat section
+        Image hullFill;
+        Image shieldFill;
+        Text salvageText;
+        RectTransform hitMarker;
+        Image[] hitMarkerBars;
+        float hitMarkerTimer;
+        Image damageFlash;
+        float damageFlashAlpha;
+        Color damageFlashColor;
+        readonly System.Collections.Generic.List<RectTransform> enemyMarkers = new System.Collections.Generic.List<RectTransform>();
+
+        // Messages (all scenes)
+        Text objectiveLabel;
+        Text objectiveText;
+        Text titleText;
+        Text subtitleText;
+        float titleTimer;
+        float titleDuration;
 
         void Awake()
         {
@@ -54,7 +75,9 @@ namespace Driftlight
             scaler.matchWidthOrHeight = 0.5f;
             root = (RectTransform)canvasObject.transform;
 
+            BuildMessages();
             BuildFlightHud();
+            BuildCombatHud();
             hintTimer = controlsHintSeconds;
         }
 
@@ -67,7 +90,181 @@ namespace Driftlight
         {
             if (!ship) ship = ShipController.Player;
             if (ship && !shipInput) shipInput = ship.GetComponent<ShipPlayerInput>();
+            if (ship && !shipHealth) shipHealth = ship.GetComponent<Health>();
+            UpdateMessages();
             UpdateFlightHud();
+            UpdateCombatHud();
+        }
+
+        // ------------------------------------------------------------------ public API
+
+        /// <summary>Sets the objective line in the top-left corner (null or empty hides it).</summary>
+        public void SetObjective(string text)
+        {
+            bool show = !string.IsNullOrEmpty(text);
+            objectiveLabel.enabled = show;
+            objectiveText.text = show ? text : "";
+        }
+
+        /// <summary>Shows a big centred title and subtitle that fade out after <paramref name="seconds"/>.</summary>
+        public void ShowTitle(string title, string subtitle, float seconds)
+        {
+            titleText.text = Spaced(title ?? "");
+            subtitleText.text = subtitle ?? "";
+            titleDuration = Mathf.Max(0.5f, seconds);
+            titleTimer = titleDuration;
+        }
+
+        /// <summary>Flashes the hit marker around the crosshair (orange for a kill).</summary>
+        public void ShowHitMarker(bool kill)
+        {
+            hitMarkerTimer = kill ? 0.3f : 0.12f;
+            var colour = kill ? Warning : Color.white;
+            foreach (var bar in hitMarkerBars) bar.color = colour;
+            hitMarker.localScale = Vector3.one * (kill ? 1.4f : 1f);
+        }
+
+        /// <summary>Flashes the screen edges: blue when shields absorb the hit, red when the hull takes it.</summary>
+        public void FlashDamage(bool shielded)
+        {
+            damageFlashColor = shielded ? new Color(0.3f, 0.8f, 1f) : new Color(1f, 0.15f, 0.1f);
+            damageFlashAlpha = shielded ? 0.18f : 0.35f;
+        }
+
+        // ------------------------------------------------------------------ messages
+
+        void BuildMessages()
+        {
+            var group = Group("Messages");
+            objectiveLabel = Label("Objective Label", group, new Vector2(0f, 1f), new Vector2(60f, -56f), new Vector2(600f, 22f), 16, TextAnchor.UpperLeft, AccentDim);
+            objectiveLabel.text = "OBJECTIVE";
+            objectiveLabel.enabled = false;
+            objectiveText = Label("Objective", group, new Vector2(0f, 1f), new Vector2(60f, -80f), new Vector2(700f, 60f), 26, TextAnchor.UpperLeft, Color.white);
+
+            titleText = Label("Title", group, new Vector2(0.5f, 1f), new Vector2(0f, -170f), new Vector2(1600f, 70f), 54, TextAnchor.MiddleCenter, Accent);
+            subtitleText = Label("Subtitle", group, new Vector2(0.5f, 1f), new Vector2(0f, -240f), new Vector2(1400f, 40f), 24, TextAnchor.MiddleCenter, Color.white);
+            titleText.color = new Color(Accent.r, Accent.g, Accent.b, 0f);
+            subtitleText.color = new Color(1f, 1f, 1f, 0f);
+        }
+
+        void UpdateMessages()
+        {
+            if (titleTimer <= 0f) return;
+            titleTimer -= Time.deltaTime;
+            float elapsed = titleDuration - titleTimer;
+            float alpha = Mathf.Clamp01(elapsed / 0.4f) * Mathf.Clamp01(titleTimer / 0.8f);
+            titleText.color = new Color(Accent.r, Accent.g, Accent.b, alpha);
+            subtitleText.color = new Color(1f, 1f, 1f, alpha * 0.9f);
+        }
+
+        // ------------------------------------------------------------------ combat
+
+        void BuildCombatHud()
+        {
+            // Full-screen damage tint (sits under everything else).
+            damageFlash = Box("Damage Flash", root, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero, Color.clear);
+            var flashRect = damageFlash.rectTransform;
+            flashRect.anchorMin = Vector2.zero;
+            flashRect.anchorMax = Vector2.one;
+            flashRect.sizeDelta = Vector2.zero;
+            flashRect.SetAsFirstSibling();
+
+            shieldFill = Bar("SHIELDS", flightGroup, new Vector2(60f, 108f), 300f, Accent);
+            hullFill = Bar("HULL", flightGroup, new Vector2(60f, 156f), 300f, Warning);
+
+            Label("Salvage Label", flightGroup, new Vector2(1f, 0f), new Vector2(-60f, 196f), new Vector2(300f, 24f), 18, TextAnchor.LowerRight, AccentDim).text = "SALVAGE";
+            salvageText = Label("Salvage", flightGroup, new Vector2(1f, 0f), new Vector2(-60f, 150f), new Vector2(300f, 46f), 36, TextAnchor.LowerRight, Amber);
+
+            // Hit marker: four diagonal ticks around the crosshair.
+            hitMarker = Rect("Hit Marker", flightGroup, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(60f, 60f));
+            hitMarkerBars = new Image[4];
+            for (int i = 0; i < 4; i++)
+            {
+                float angle = 45f + 90f * i;
+                Vector2 offset = new Vector2(Mathf.Cos(angle * Mathf.Deg2Rad), Mathf.Sin(angle * Mathf.Deg2Rad)) * 17f;
+                hitMarkerBars[i] = Box("Tick", hitMarker, new Vector2(0.5f, 0.5f), offset, new Vector2(11f, 2.5f), Color.white);
+                hitMarkerBars[i].rectTransform.pivot = new Vector2(0.5f, 0.5f);
+                hitMarkerBars[i].rectTransform.anchoredPosition = offset;
+                hitMarkerBars[i].rectTransform.localRotation = Quaternion.Euler(0f, 0f, angle);
+            }
+            hitMarker.gameObject.SetActive(false);
+        }
+
+        void UpdateCombatHud()
+        {
+            float dt = Time.deltaTime;
+
+            damageFlashAlpha = Mathf.MoveTowards(damageFlashAlpha, 0f, dt * 1.2f);
+            damageFlash.color = new Color(damageFlashColor.r, damageFlashColor.g, damageFlashColor.b, damageFlashAlpha);
+
+            hitMarkerTimer -= dt;
+            hitMarker.gameObject.SetActive(hitMarkerTimer > 0f && ship);
+            hitMarker.localScale = Vector3.Lerp(hitMarker.localScale, Vector3.one, dt * 10f);
+
+            if (!ship) return;
+            if (shipHealth)
+            {
+                SetBar(hullFill, shipHealth.Hull01);
+                SetBar(shieldFill, shipHealth.Shield01);
+            }
+            salvageText.text = GameState.Salvage.ToString("0000");
+            UpdateEnemyMarkers();
+        }
+
+        void UpdateEnemyMarkers()
+        {
+            var cam = Camera.main;
+            var drones = EnemyDrone.Active;
+            while (enemyMarkers.Count < drones.Count) enemyMarkers.Add(BuildEnemyMarker());
+
+            for (int i = 0; i < enemyMarkers.Count; i++)
+            {
+                var marker = enemyMarkers[i];
+                bool show = cam && i < drones.Count;
+                if (marker.gameObject.activeSelf != show) marker.gameObject.SetActive(show);
+                if (!show) continue;
+
+                Vector3 screen = cam.WorldToScreenPoint(drones[i].transform.position);
+                bool behind = screen.z < 0f;
+                if (behind) screen = new Vector3(Screen.width - screen.x, Screen.height - screen.y, 0f);
+
+                const float margin = 50f;
+                bool onScreen = !behind && screen.x > margin && screen.x < Screen.width - margin && screen.y > margin && screen.y < Screen.height - margin;
+                if (!onScreen)
+                {
+                    // Push the marker to the screen edge in the drone's direction.
+                    Vector2 centre = new Vector2(Screen.width, Screen.height) * 0.5f;
+                    Vector2 dir = (Vector2)screen - centre;
+                    if (dir.sqrMagnitude < 1f) dir = Vector2.down;
+                    float scale = Mathf.Min((centre.x - margin) / Mathf.Max(Mathf.Abs(dir.x), 1e-4f),
+                                            (centre.y - margin) / Mathf.Max(Mathf.Abs(dir.y), 1e-4f));
+                    screen = centre + dir * scale;
+                }
+
+                RectTransformUtility.ScreenPointToLocalPointInRectangle(root, screen, null, out Vector2 local);
+                marker.anchoredPosition = local;
+                float distance = Vector3.Distance(cam.transform.position, drones[i].transform.position);
+                float size = onScreen ? Mathf.Clamp(900f / Mathf.Max(distance, 1f), 0.7f, 1.6f) : 0.8f;
+                marker.localScale = Vector3.one * size;
+                marker.localRotation = Quaternion.identity;
+            }
+        }
+
+        RectTransform BuildEnemyMarker()
+        {
+            // A diamond outline made of four short bars.
+            var marker = Rect("Enemy Marker", flightGroup, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(30f, 30f));
+            marker.pivot = new Vector2(0.5f, 0.5f);
+            for (int i = 0; i < 4; i++)
+            {
+                float angle = 45f + 90f * i;
+                Vector2 offset = new Vector2(Mathf.Cos(angle * Mathf.Deg2Rad), Mathf.Sin(angle * Mathf.Deg2Rad)) * 9f;
+                var bar = Box("Edge", marker, new Vector2(0.5f, 0.5f), offset, new Vector2(15f, 2.5f), Warning);
+                bar.rectTransform.pivot = new Vector2(0.5f, 0.5f);
+                bar.rectTransform.anchoredPosition = offset;
+                bar.rectTransform.localRotation = Quaternion.Euler(0f, 0f, angle + 90f);
+            }
+            return marker;
         }
 
         // ------------------------------------------------------------------ flight

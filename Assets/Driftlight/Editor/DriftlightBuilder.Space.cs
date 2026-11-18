@@ -45,7 +45,8 @@ namespace Driftlight.EditorTools
             BuildRelayStation(world);
             BuildAsteroidField(world);
 
-            var shipPrefab = BuildPlayerShipPrefab();
+            var combat = BuildCombatPrefabs();
+            var shipPrefab = BuildPlayerShipPrefab(combat);
             var ship = (GameObject)PrefabUtility.InstantiatePrefab(shipPrefab);
             ship.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
 
@@ -58,6 +59,9 @@ namespace Driftlight.EditorTools
 
             var systems = new GameObject("Game Systems");
             systems.AddComponent<CursorLock>();
+            var encounter = systems.AddComponent<EncounterDirector>();
+            encounter.dronePrefab = combat.drone;
+            encounter.warpInEffect = combat.warpIn;
             new GameObject("HUD").AddComponent<Hud>();
 
             SaveScene(scene, SpaceScenePath, 0);
@@ -65,7 +69,7 @@ namespace Driftlight.EditorTools
 
         // ------------------------------------------------------------------ player ship
 
-        static GameObject BuildPlayerShipPrefab()
+        static GameObject BuildPlayerShipPrefab(CombatPrefabs combat)
         {
             var root = new GameObject("Player Ship");
             root.tag = "Player";
@@ -86,9 +90,25 @@ namespace Driftlight.EditorTools
             glow.trails = parts.trails;
             glow.engineLight = parts.engineLight;
 
-            var prefab = PrefabUtility.SaveAsPrefabAsset(root, $"{PrefabsDir}/Player Ship.prefab");
-            Object.DestroyImmediate(root);
-            return prefab;
+            var health = root.AddComponent<Health>();
+            health.team = Team.Player;
+            health.maxHull = 100f;
+            health.maxShield = 60f;
+            health.shieldRegenDelay = 3f;
+            health.shieldRegenRate = 14f;
+
+            var blaster = root.AddComponent<Blaster>();
+            blaster.projectilePrefab = combat.playerBolt;
+            blaster.muzzles = parts.muzzles;
+            blaster.team = Team.Player;
+            blaster.fireRate = 9f;
+            blaster.spread = 0.25f;
+            blaster.aimAtCrosshair = true;
+            blaster.volume = 0.3f;
+
+            root.AddComponent<PlayerShipDamage>().explosionPrefab = combat.bigExplosion;
+
+            return SavePrefab(root, "Player Ship");
         }
 
         // ------------------------------------------------------------------ sky objects
