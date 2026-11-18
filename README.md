@@ -19,18 +19,18 @@ We both work across the whole stack: the "backend" (gameplay code, AI, upgrade a
 
 ## Current target for the game
 
-*Target as of the first group review: a tight, polished game of **about 15 minutes**. It will change as we playtest.*
+*Target as of the first group review: a tight, polished game of **about 10 minutes**. It will change as we playtest.*
 
 **Genre:** single-player 3D action exploration (space combat + on-foot exploration), with a mystery story.
 
-### The run (about 15 minutes)
+### The run (about 10 minutes)
 
 | # | Stop | What happens | Time |
 |---|---|---|---|
 | 1 | **The Drift** | Space fight at the derelict signal relay, then warp | ~2 min |
-| 2 | **Verdance** | Glowing jungle at dusk. Learn the **scanner**, follow the beam, recover signal fragment 1 | ~3–4 min |
-| 3 | **Cinder** | Lava fields and eruptions. Use the **jetpack** to cross the lava to fragment 2 | ~3–4 min |
-| 4 | **The Source** | Short boss fight, fragment 3 and the story reveal | ~4 min |
+| 2 | **Verdance** | Glowing jungle at dusk. Learn the **scanner**, follow the beam, recover signal fragment 1 | ~3 min |
+| 3 | **Cinder** | Lava fields and eruptions. Use the **jetpack** to cross the lava to fragment 2 | ~3 min |
+| 4 | **The Source** | Short boss fight, fragment 3 and the story reveal | ~2 min |
 
 Between planets you **pick 1 of 3 upgrades** (shields, fire rate or boost), paid for with the salvage you collected.
 
@@ -45,7 +45,7 @@ Between planets you **pick 1 of 3 upgrades** (shields, fire rate or boost), paid
 There are three signal fragments, one on each stop. Each is a short log from the people who vanished, and together they explain what happened on the day everyone disappeared, and why the signal is calling *you*.
 
 ### Cut for time
-Glacius, Mirage, Abyssa, Prism and Hollow, the grapple, and a full upgrade shop. We'll only bring one back if the 15-minute version is finished and polished.
+Glacius, Mirage, Abyssa, Prism and Hollow, the grapple, and a full upgrade shop. We'll only bring one back if the 10-minute version is finished and polished.
 
 ---
 
@@ -74,7 +74,11 @@ Glacius, Mirage, Abyssa, Prism and Hollow, the grapple, and a full upgrade shop.
 
 ## Gameplay video
 
-*Coming soon. The link to our current gameplay video will go here.*
+**[▶ Watch the 25-second gameplay clip (MP4)](docs/media/gameplay.mp4)**: flying through The Drift, the fight at the signal relay, and landing on Verdance.
+
+![DRIFTLIGHT gameplay](docs/media/gameplay.gif)
+
+*Recorded from a real build with the game's autoplay mode (`-autoplay -capture`), so it shows actual gameplay, not edited footage.*
 
 ---
 
@@ -87,7 +91,7 @@ Glacius, Mirage, Abyssa, Prism and Hollow, the grapple, and a full upgrade shop.
 - [x] Space combat: blasters, enemy drones, waves, HUD
 - [x] Warp drive and the first planet (Verdance)
 - [ ] Main menu
-- [ ] Story bible and fragment logs
+- [x] Story bible and fragment logs (`docs/STORY.md`)
 - [ ] Cinder
 - [ ] Upgrade picker
 - [ ] Scanner and jetpack
@@ -99,7 +103,7 @@ Glacius, Mirage, Abyssa, Prism and Hollow, the grapple, and a full upgrade shop.
 |---|---|
 | **Group review (now)** | Fly the ship, fight enemy drones, warp to Verdance, recover fragment 1 |
 | **Milestone 2** | Main menu, Cinder, the upgrade picker, the full story |
-| **Milestone 3** | The Source and the boss; the whole 15-minute run playable start to finish |
+| **Milestone 3** | The Source and the boss; the whole 10-minute run playable start to finish |
 | **Final** | Polish: audio, effects, balancing, the gameplay video |
 
 ---

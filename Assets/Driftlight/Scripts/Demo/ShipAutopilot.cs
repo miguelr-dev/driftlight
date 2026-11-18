@@ -39,7 +39,7 @@ namespace Driftlight
                 aim = target.transform.position + (target.Velocity - ship.Velocity) * (distance / boltSpeed);
                 thrust = distance > 110f ? 1f : 0.3f;
                 boost = distance > 260f;
-                fire = distance < 240f && Vector3.Angle(transform.forward, aim - transform.position) < 4f;
+                fire = distance < 240f && Vector3.Angle(transform.forward, aim - transform.position) < 8f;
             }
             else if (warp && warp.Unlocked && warp.destinationMarker)
             {
@@ -67,7 +67,11 @@ namespace Driftlight
             ship.boost = boost;
             ship.strafe = 0f;
             ship.lift = 0f;
-            foreach (var blaster in blasters) blaster.triggerHeld = fire;
+            foreach (var blaster in blasters)
+            {
+                blaster.triggerHeld = fire;
+                blaster.aimPoint = fire ? aim : (Vector3?)null;
+            }
             if (warp) warp.chargeHeld = chargeWarp;
 
             logTimer -= dt;
@@ -75,7 +79,7 @@ namespace Driftlight
             {
                 logTimer = 5f;
                 var health = GetComponent<Health>();
-                Debug.Log($"[DEMO] t={Time.timeSinceLevelLoad:0}s drones={EnemyDrone.Active.Count} salvage={GameState.Salvage} hull={(health ? health.Hull : 0):0} shield={(health ? health.Shield : 0):0} warpUnlocked={(warp && warp.Unlocked)} charge={(warp ? warp.Charge01 : 0):0.00}");
+                Debug.Log($"[DEMO] t={Time.timeSinceLevelLoad:0}s drones={EnemyDrone.Active.Count} salvage={GameState.Salvage} hull={(health ? health.Hull : 0):0} shield={(health ? health.Shield : 0):0} warpUnlocked={(warp && warp.Unlocked)} charge={(warp ? warp.Charge01 : 0):0.00} shots P{Blaster.PlayerShots}/E{Blaster.EnemyShots} hits P{Projectile.PlayerHits}/E{Projectile.EnemyHits}");
             }
         }
     }

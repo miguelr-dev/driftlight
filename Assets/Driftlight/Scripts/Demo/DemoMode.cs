@@ -14,12 +14,15 @@ namespace Driftlight
     {
         public static bool Autoplay { get; private set; }
         public static string CaptureFolder { get; private set; }
+        /// <summary>-scene &lt;name&gt;: jump straight to a scene (e.g. Verdance) instead of the first one.</summary>
+        public static string StartScene { get; private set; }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         static void Init()
         {
             Autoplay = false;
             CaptureFolder = null;
+            StartScene = null;
             if (Application.isEditor) return;
 
             string[] args = Environment.GetCommandLineArgs();
@@ -27,6 +30,7 @@ namespace Driftlight
             {
                 if (args[i] == "-autoplay") Autoplay = true;
                 else if (args[i] == "-capture" && i + 1 < args.Length) CaptureFolder = args[++i];
+                else if (args[i] == "-scene" && i + 1 < args.Length) StartScene = args[++i];
             }
             if (!Autoplay && CaptureFolder == null) return;
 

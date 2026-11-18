@@ -13,6 +13,9 @@ namespace Driftlight
         public float lifetime = 2.2f;
         public GameObject impactPrefab;
 
+        /// <summary>Hits landed this session, per team (shown in the demo log).</summary>
+        public static int PlayerHits, EnemyHits;
+
         Team team;
         Transform owner;
         Vector3 velocity;
@@ -57,6 +60,7 @@ namespace Driftlight
             var health = hit.collider.GetComponentInParent<Health>();
             if (health && health.team != team)
             {
+                if (team == Team.Player) PlayerHits++; else EnemyHits++;
                 bool wasAlive = !health.IsDead;
                 health.TakeDamage(damage, hit.point);
                 if (team == Team.Player && wasAlive && Hud.Instance) Hud.Instance.ShowHitMarker(health.IsDead);

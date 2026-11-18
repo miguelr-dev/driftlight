@@ -15,6 +15,7 @@ namespace Driftlight
         float elapsed;
         float fragmentTime = -1f;
         SignalFragment fragment;
+        bool jumped;
 
         void OnEnable() => SceneManager.sceneLoaded += OnSceneLoaded;
         void OnDisable() => SceneManager.sceneLoaded -= OnSceneLoaded;
@@ -22,6 +23,12 @@ namespace Driftlight
         void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
             Debug.Log($"[DEMO] Scene loaded: {scene.name}");
+            if (!string.IsNullOrEmpty(DemoMode.StartScene) && scene.name != DemoMode.StartScene && !jumped)
+            {
+                jumped = true;
+                SceneManager.LoadScene(DemoMode.StartScene);
+                return;
+            }
             fragment = FindAnyObjectByType<SignalFragment>();
 
             var cursor = FindAnyObjectByType<CursorLock>();

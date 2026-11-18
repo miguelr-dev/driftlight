@@ -1814,6 +1814,7 @@ MonoBehaviour:
   team: 0
   aimAtCrosshair: 1
   convergenceDistance: 260
+  aimAssistDegrees: 3.5
   volume: 0.3
 --- !u!114 &6968927042145906149
 MonoBehaviour:
