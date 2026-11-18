@@ -1,0 +1,105 @@
+/* DRIFTLIGHT mockup styles, shared by hud.html and planets.html */
+:root {
+  --bg: #05070d;
+  --space: #0a0f1c;
+  --text: #e8f8ff;
+  --dim: #8aa0b2;
+  --accent: #5fe3ff;   /* cyan: friendly UI, shields, player */
+  --danger: #ff4d5e;   /* red: enemies, hull, lock-on */
+  --salvage: #ffb347;  /* amber: salvage, upgrades, radar */
+  --signal: #b77cff;   /* violet: the signal and fragments */
+  --locked: #3a4756;
+  --glass: rgba(8, 14, 26, 0.55);
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 15px/1.45 "Exo 2", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  padding: 32px 16px 64px;
+}
+header, section { max-width: 1120px; margin: 0 auto; }
+header { margin-bottom: 36px; }
+header p { margin: 8px 0 14px; color: var(--dim); }
+section { margin-bottom: 48px; }
+section h2 { font-size: 13px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--dim); margin: 0 0 10px; font-weight: 600; }
+section > p { color: var(--dim); margin: 8px 0 0; font-size: 14px; }
+
+/* logo: bold italic, white, cyan light streak under it */
+.logo {
+  display: inline-block; position: relative;
+  font-weight: 800; font-style: italic; letter-spacing: 0.04em;
+  font-size: 34px; color: #fff; line-height: 1;
+  text-shadow: 0 0 14px rgba(95, 227, 255, 0.55);
+}
+.logo::after {
+  content: ""; position: absolute; left: 55%; right: -4%; bottom: -0.22em; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  box-shadow: 0 0 8px var(--accent);
+}
+.logo.corner { position: absolute; right: 3%; bottom: 6%; font-size: 2.2em; }
+
+/* 16:9 game frame */
+.screen {
+  position: relative; aspect-ratio: 16 / 9; width: 100%; overflow: hidden;
+  border: 1px solid #1a2433; border-radius: 6px;
+  background: radial-gradient(ellipse at 30% 20%, #142238 0%, var(--space) 55%, #04060b 100%);
+  font-size: clamp(9px, 1.25vw, 14px);
+}
+.stars::before {
+  content: ""; position: absolute; inset: 0; opacity: 0.7; pointer-events: none;
+  background-image:
+    radial-gradient(1px 1px at 12% 18%, #fff, transparent), radial-gradient(1px 1px at 72% 12%, #fff, transparent),
+    radial-gradient(1px 1px at 44% 26%, #cfe, transparent), radial-gradient(1px 1px at 88% 32%, #fff, transparent),
+    radial-gradient(1px 1px at 22% 42%, #def, transparent), radial-gradient(1px 1px at 60% 8%, #fff, transparent),
+    radial-gradient(1px 1px at 5% 30%, #fff, transparent), radial-gradient(1px 1px at 35% 6%, #cfe, transparent);
+}
+.abs { position: absolute; }
+.label { font-size: 0.78em; letter-spacing: 0.14em; text-transform: uppercase; color: var(--dim); }
+.num { font-variant-numeric: tabular-nums; font-weight: 600; }
+
+/* HUD bars: slanted, glowing, no boxes */
+.bar { height: 0.6em; width: 12em; background: rgba(255,255,255,0.1); transform: skewX(-20deg); overflow: hidden; }
+.bar.thin { height: 0.4em; width: 8em; margin-top: 0.35em; }
+.bar > i { display: block; height: 100%; }
+.cyan > i { background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+.red > i { background: var(--danger); box-shadow: 0 0 10px var(--danger); }
+.amber > i { background: var(--salvage); box-shadow: 0 0 10px var(--salvage); }
+.ice > i { background: linear-gradient(90deg, #2f8cff, #bfe9ff); box-shadow: 0 0 10px #7fd0ff; }
+
+/* shield badge, top-left */
+.shield-badge { width: 2.8em; height: 3.1em; border: 2px solid var(--accent); clip-path: polygon(50% 0, 100% 18%, 92% 70%, 50% 100%, 8% 70%, 0 18%);
+  background: radial-gradient(circle at 50% 45%, rgba(95,227,255,0.45), transparent 70%); box-shadow: 0 0 12px var(--accent); }
+
+/* radar, top-right */
+.radar { width: 8em; height: 5.2em; border: 1px solid rgba(255,179,71,0.6); background: rgba(40, 24, 6, 0.55); overflow: hidden; }
+.radar::before { content: ""; position: absolute; left: 50%; bottom: -60%; width: 9em; height: 9em; transform: translateX(-50%);
+  background: conic-gradient(from -40deg, rgba(255,179,71,0.35) 0 80deg, transparent 80deg); border-radius: 50%; }
+.radar i { position: absolute; width: 0.4em; height: 0.4em; border-radius: 50%; background: var(--danger); box-shadow: 0 0 6px var(--danger); }
+.radar b { position: absolute; left: 50%; bottom: 0.4em; transform: translateX(-50%); width: 0; height: 0;
+  border-left: 0.35em solid transparent; border-right: 0.35em solid transparent; border-bottom: 0.6em solid var(--salvage); }
+
+/* lock-on reticle (ship) */
+.lock { width: 3.4em; height: 3.4em; border: 2px solid var(--danger); border-radius: 50%; box-shadow: 0 0 10px rgba(255,77,94,0.6); }
+.lock::before, .lock::after { content: ""; position: absolute; background: var(--danger); }
+.lock::before { left: 50%; top: -0.5em; bottom: -0.5em; width: 2px; transform: translateX(-50%); }
+.lock::after { top: 50%; left: -0.5em; right: -0.5em; height: 2px; transform: translateY(-50%); }
+.lock-arc { width: 4.6em; height: 4.6em; border-radius: 50%; border: 3px solid transparent; border-right-color: var(--danger); filter: drop-shadow(0 0 4px var(--danger)); }
+
+/* simple dot crosshair (on foot, first person) */
+.dot { width: 0.4em; height: 0.4em; border-radius: 50%; background: var(--accent); box-shadow: 0 0 6px var(--accent); transform: translate(-50%, -50%); }
+.ring { width: 2.4em; height: 2.4em; border-radius: 50%; border: 1px solid rgba(95,227,255,0.45); transform: translate(-50%, -50%); }
+
+/* shapes used to sketch scenes */
+.enemy { width: 1.6em; height: 1.2em; background: #2a0d12; clip-path: polygon(50% 100%, 0 0, 50% 30%, 100% 0); }
+.enemy::after { content: ""; position: absolute; left: 50%; top: 35%; width: 0.45em; height: 0.45em; transform: translateX(-50%); border-radius: 50%; background: var(--danger); box-shadow: 0 0 10px 3px var(--danger); }
+.tracer { height: 2px; background: linear-gradient(90deg, transparent, #ffd27a); box-shadow: 0 0 6px #ffb347; transform-origin: right center; }
+.fragment { width: 1.4em; height: 2.4em; background: linear-gradient(160deg, #e3c9ff, var(--signal)); clip-path: polygon(50% 0, 100% 30%, 80% 100%, 20% 100%, 0 30%);
+  filter: drop-shadow(0 0 10px var(--signal)); }
+
+.tag { display: inline-flex; align-items: center; gap: 0.5em; font-size: 0.95em; }
+.tag .gem { width: 0.7em; height: 1em; background: var(--signal); clip-path: polygon(50% 0, 100% 35%, 50% 100%, 0 35%); box-shadow: 0 0 8px var(--signal); }
+
+.legend { display: flex; flex-wrap: wrap; gap: 0.5em 1.5em; color: var(--dim); font-size: 13px; }
+.legend b { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
