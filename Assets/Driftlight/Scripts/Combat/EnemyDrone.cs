@@ -24,7 +24,7 @@ namespace Driftlight
         [Header("Weapons")]
         public Blaster blaster;
         public float fireRange = 190f;
-        public float fireAngle = 9f;
+        public float fireAngle = 20f;
         public Vector2 firstShotDelay = new Vector2(1.2f, 2.8f);
 
         [Header("Reward and effects")]
@@ -102,6 +102,7 @@ namespace Driftlight
                     blaster.triggerHeld = playerAlive && Time.time > fireReadyTime && distance < fireRange
                                           && Vector3.Angle(transform.forward, aim) < fireAngle;
                     blaster.externalVelocity = Velocity;
+                    blaster.aimPoint = lead; // bolts go where the player will be, not where the drone happens to face
                 }
             }
             else if (blaster)

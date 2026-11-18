@@ -13,8 +13,8 @@ namespace Driftlight
         public EnemyDrone dronePrefab;
         public GameObject warpInEffect;
         [Tooltip("Number of drones in each wave.")]
-        public int[] waves = { 3, 5 };
-        public float startDelay = 8f;
+        public int[] waves = { 3, 4 };
+        public float startDelay = 6f;
         public float timeBetweenWaves = 4f;
         public float spawnDistance = 230f;
 

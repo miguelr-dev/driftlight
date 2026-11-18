@@ -136,6 +136,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Driftlight.Projectile
   speed: 190
-  damage: 4
+  damage: 2.5
   lifetime: 2.2
   impactPrefab: {fileID: 5465140138019155126, guid: e38892aa038864958ab65752d799a302, type: 3}

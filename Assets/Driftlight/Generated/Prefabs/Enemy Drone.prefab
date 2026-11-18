@@ -124,11 +124,12 @@ MonoBehaviour:
   projectilePrefab: {fileID: 8039686810836534391, guid: a8a990a01695f410f84cc0ddf5e0dc7a, type: 3}
   muzzles:
   - {fileID: 3952453476684016527}
-  fireRate: 1.6
-  spread: 1.2
+  fireRate: 1
+  spread: 4
   team: 1
   aimAtCrosshair: 0
   convergenceDistance: 260
+  aimAssistDegrees: 3.5
   volume: 0.22
 --- !u!114 &742344319128129169
 MonoBehaviour:
@@ -149,7 +150,7 @@ MonoBehaviour:
   turnSpeed: 3.5
   blaster: {fileID: 5581240229356228015}
   fireRange: 190
-  fireAngle: 9
+  fireAngle: 20
   firstShotDelay: {x: 1.2, y: 2.8}
   salvageReward: 15
   explosionPrefab: {fileID: 8365979538729302563, guid: 414d791ec8f164ba3952de4a5a897eb1, type: 3}

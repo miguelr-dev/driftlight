@@ -32,7 +32,7 @@ namespace Driftlight.EditorTools
                 sparks: 40, sparkSpeed: 30f, flashSize: 20f, lightRange: 50f, lightIntensity: 8f, lifetime: 2.5f, embers: false);
 
             prefabs.playerBolt = BuildBoltPrefab("Player Bolt", new Color(0.6f, 2.2f, 4.5f), speed: 300f, damage: 7f, impact: prefabs.impact);
-            prefabs.enemyBolt = BuildBoltPrefab("Enemy Bolt", new Color(4.5f, 0.9f, 0.35f), speed: 190f, damage: 4f, impact: prefabs.impact);
+            prefabs.enemyBolt = BuildBoltPrefab("Enemy Bolt", new Color(4.5f, 0.9f, 0.35f), speed: 190f, damage: 2.5f, impact: prefabs.impact);
             prefabs.drone = BuildDronePrefab(prefabs.enemyBolt, prefabs.explosion);
             return prefabs;
         }
@@ -168,8 +168,8 @@ namespace Driftlight.EditorTools
             blaster.projectilePrefab = enemyBolt;
             blaster.muzzles = new[] { muzzle };
             blaster.team = Team.Enemy;
-            blaster.fireRate = 1.6f;
-            blaster.spread = 1.2f;
+            blaster.fireRate = 1f;
+            blaster.spread = 4f;
             blaster.volume = 0.22f;
 
             var drone = root.AddComponent<EnemyDrone>();
