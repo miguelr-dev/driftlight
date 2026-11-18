@@ -26,3 +26,10 @@
 *.ttf  binary
 *.otf  binary
 *.mp4  binary
+
+# Unity always saves some assets in binary, even with text serialization.
+# Line-ending conversion would corrupt them, so store them byte-for-byte.
+*Terrain*.asset binary
+LightingData.asset binary
+*NavMesh*.asset binary
+*.cubemap binary
