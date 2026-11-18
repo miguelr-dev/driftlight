@@ -21,10 +21,12 @@ namespace Driftlight
         public Vector2 Stick { get; private set; }
 
         ShipController ship;
+        Blaster[] blasters;
 
         void Awake()
         {
             ship = GetComponent<ShipController>();
+            blasters = GetComponentsInChildren<Blaster>();
         }
 
         void Update()
@@ -48,6 +50,9 @@ namespace Driftlight
             ship.lift = Axis(keyboard.spaceKey.isPressed, keyboard.leftCtrlKey.isPressed);
             ship.roll = Axis(keyboard.eKey.isPressed, keyboard.qKey.isPressed);
             ship.boost = keyboard.leftShiftKey.isPressed;
+
+            bool fire = cursorLocked && ship.ControlsEnabled && mouse != null && mouse.leftButton.isPressed;
+            foreach (var blaster in blasters) blaster.triggerHeld = fire;
         }
 
         static float Axis(bool positive, bool negative) => (positive ? 1f : 0f) - (negative ? 1f : 0f);

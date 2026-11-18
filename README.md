@@ -88,7 +88,7 @@ Every planet holds one signal fragment. Each fragment is a short log from the pe
 - [x] Repo, Unity `.gitignore` and README
 - [x] Unity 6 project (URP)
 - [x] Ship flight and chase camera
-- [ ] Space combat: blasters, enemy drones, waves, HUD
+- [x] Space combat: blasters, enemy drones, waves, HUD
 - [ ] Warp drive and the first planet (Verdance)
 - [ ] Upgrade shop
 - [ ] Planets 2–5
@@ -120,6 +120,7 @@ Every planet holds one signal fragment. Each fragment is a short log from the pe
 | Ship | |
 |---|---|
 | Mouse | Steer (the small diamond shows how hard you're turning) |
+| Left click | Fire blasters |
 | W / S | Thrust / brake |
 | A / D | Strafe |
 | Q / E | Roll |

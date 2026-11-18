@@ -1635,6 +1635,9 @@ GameObject:
   - component: {fileID: 6343268009156049169}
   - component: {fileID: 7376856130284002846}
   - component: {fileID: 1322363754619996543}
+  - component: {fileID: 3917917364912310674}
+  - component: {fileID: 2956423163989114193}
+  - component: {fileID: 6968927042145906149}
   m_Layer: 0
   m_Name: Player Ship
   m_TagString: Player
@@ -1771,6 +1774,62 @@ MonoBehaviour:
   idleLevel: 0.3
   boostMultiplier: 2.2
   lightIntensity: 4
+--- !u!114 &3917917364912310674
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8373197690784731182}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14a210fa6ca2d492a87a0e04356a30ae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Driftlight.Health
+  team: 0
+  maxHull: 100
+  maxShield: 60
+  shieldRegenDelay: 3
+  shieldRegenRate: 14
+  minHull: 0
+--- !u!114 &2956423163989114193
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8373197690784731182}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c03f20c101364a77b3906e128ddf7ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Driftlight.Blaster
+  projectilePrefab: {fileID: 3304481059327739742, guid: 5f1340ce032d74e7ead9206a79a54255, type: 3}
+  muzzles:
+  - {fileID: 4137341514856742094}
+  - {fileID: 6934680498821971912}
+  fireRate: 9
+  spread: 0.25
+  team: 0
+  aimAtCrosshair: 1
+  convergenceDistance: 260
+  volume: 0.3
+--- !u!114 &6968927042145906149
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8373197690784731182}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 045a2fc6eb6a04452b2e969c68a0b332, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Driftlight.PlayerShipDamage
+  explosionPrefab: {fileID: 5253979250117551421, guid: 2815bc6ca6ee046679d3035b03267e5a, type: 3}
+  safeImpactSpeed: 12
+  crashDamagePerSpeed: 0.8
+  respawnDelay: 3.5
 --- !u!1 &8581810004406297850
 GameObject:
   m_ObjectHideFlags: 0
