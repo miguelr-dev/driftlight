@@ -1638,6 +1638,7 @@ GameObject:
   - component: {fileID: 3917917364912310674}
   - component: {fileID: 2956423163989114193}
   - component: {fileID: 6968927042145906149}
+  - component: {fileID: 3821511226952508065}
   m_Layer: 0
   m_Name: Player Ship
   m_TagString: Player
@@ -1830,6 +1831,26 @@ MonoBehaviour:
   safeImpactSpeed: 12
   crashDamagePerSpeed: 0.8
   respawnDelay: 3.5
+--- !u!114 &3821511226952508065
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8373197690784731182}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e0754aa4a9a443e7b8ea3e23bf5e757, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Driftlight.WarpDrive
+  destinationScene: Verdance
+  destinationName: VERDANCE
+  destinationMarker: {fileID: 0}
+  unlockAfter: {fileID: 0}
+  chargeTime: 1.8
+  tunnelTime: 2.4
+  warpSpeed: 2500
+  streaks: {fileID: 0}
 --- !u!1 &8581810004406297850
 GameObject:
   m_ObjectHideFlags: 0

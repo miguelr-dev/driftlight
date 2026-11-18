@@ -50,19 +50,29 @@ namespace Driftlight.EditorTools
                 return null;
             }
 
+            // The editor normally compiles shaders in the background and draws a cyan placeholder
+            // until they're ready; compile them up front so screenshots show the real materials.
+            bool asyncCompilation = ShaderUtil.allowAsyncCompilation;
+            ShaderUtil.allowAsyncCompilation = false;
+
             var target = new RenderTexture(width, height, 24, RenderTextureFormat.ARGB32);
             var request = new RenderPipeline.StandardRequest { destination = target };
-            if (RenderPipeline.SupportsRenderRequest(cam, request))
+            // Render twice: the first frame after opening a scene can miss lighting and textures.
+            for (int pass = 0; pass < 2; pass++)
             {
-                RenderPipeline.SubmitRenderRequest(cam, request);
+                if (RenderPipeline.SupportsRenderRequest(cam, request))
+                {
+                    RenderPipeline.SubmitRenderRequest(cam, request);
+                }
+                else
+                {
+                    var previous = cam.targetTexture;
+                    cam.targetTexture = target;
+                    cam.Render();
+                    cam.targetTexture = previous;
+                }
             }
-            else
-            {
-                var previous = cam.targetTexture;
-                cam.targetTexture = target;
-                cam.Render();
-                cam.targetTexture = previous;
-            }
+            ShaderUtil.allowAsyncCompilation = asyncCompilation;
 
             var active = RenderTexture.active;
             RenderTexture.active = target;

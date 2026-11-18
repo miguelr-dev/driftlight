@@ -12,7 +12,11 @@ namespace Driftlight
     {
         const int SampleRate = 44100;
 
-        static AudioClip playerShot, enemyShot, impact, explosion, warpIn, alarm, shieldHit, hullHit;
+        static AudioClip playerShot, enemyShot, impact, explosion, warpIn, alarm, shieldHit, hullHit, warpCharge, warpBoom, pickup;
+
+        public static AudioClip WarpCharge => warpCharge != null ? warpCharge : warpCharge = Build("Warp Charge", 1.9f, d => Whoosh(d, 70f, 720f, 0.3f, 9));
+        public static AudioClip WarpBoom => warpBoom != null ? warpBoom : warpBoom = Build("Warp Boom", 2.6f, d => Whoosh(d, 900f, 60f, 0.65f, 13));
+        public static AudioClip Pickup => pickup != null ? pickup : pickup = Build("Pickup", 1.4f, Chime);
 
         public static AudioClip PlayerShot => playerShot != null ? playerShot : playerShot = Build("Player Shot", 0.16f, d => Laser(d, 1700f, 380f, 20f, 0.35f));
         public static AudioClip EnemyShot => enemyShot != null ? enemyShot : enemyShot = Build("Enemy Shot", 0.22f, d => Laser(d, 900f, 170f, 13f, 0.75f));
@@ -138,6 +142,24 @@ namespace Driftlight
                 low += (n - low) * Mathf.Lerp(0.05f, 0.4f, k);
                 float envelope = Mathf.Sin(Mathf.PI * k);
                 d[i] = (tone * (1f - noiseMix) + low * noiseMix * 2f) * envelope * 0.45f;
+            }
+        }
+
+        static void Chime(float[] d)
+        {
+            float[] notes = { 523.25f, 659.25f, 783.99f, 1046.5f };
+            for (int i = 0; i < d.Length; i++)
+            {
+                float t = i / (float)SampleRate;
+                float v = 0f;
+                for (int n = 0; n < notes.Length; n++)
+                {
+                    float start = n * 0.11f;
+                    if (t < start) continue;
+                    float local = t - start;
+                    v += (Mathf.Sin(2f * Mathf.PI * notes[n] * local) + 0.3f * Mathf.Sin(4f * Mathf.PI * notes[n] * local)) * Mathf.Exp(-local * 3.2f);
+                }
+                d[i] = v * 0.18f;
             }
         }
 

@@ -36,6 +36,7 @@ namespace Driftlight.EditorTools
         public static void BuildAll()
         {
             BuildSpaceScene();
+            BuildVerdanceScene();
             AssetDatabase.SaveAssets();
             Debug.Log("[DRIFTLIGHT] Build finished.");
         }

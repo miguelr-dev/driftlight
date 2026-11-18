@@ -89,7 +89,7 @@ Every planet holds one signal fragment. Each fragment is a short log from the pe
 - [x] Unity 6 project (URP)
 - [x] Ship flight and chase camera
 - [x] Space combat: blasters, enemy drones, waves, HUD
-- [ ] Warp drive and the first planet (Verdance)
+- [x] Warp drive and the first planet (Verdance)
 - [ ] Upgrade shop
 - [ ] Planets 2–5
 - [ ] Final planet, boss and story reveal
@@ -126,6 +126,21 @@ Every planet holds one signal fragment. Each fragment is a short log from the pe
 | Q / E | Roll |
 | Space / Ctrl | Up / down |
 | Shift | Boost |
+| Hold F | Warp (unlocks once the relay is clear) |
+
+| On foot | |
+|---|---|
+| Mouse | Look |
+| W A S D | Move |
+| Shift | Sprint |
+| Space | Jump |
+| E | Interact (recover signal fragments) |
+
+### Screenshots
+
+| The Drift | Verdance |
+|---|---|
+| ![The Drift: the ship, the signal relay and Verdance](docs/screenshots/Space.png) | ![Verdance at dusk, with the signal beam over the ruins](docs/screenshots/Verdance.png) |
 
 ### Scene builder
 
