@@ -86,8 +86,8 @@ Every planet holds one signal fragment. Each fragment is a short log from the pe
 ## Progress
 
 - [x] Repo, Unity `.gitignore` and README
-- [ ] Unity 6 project (URP)
-- [ ] Ship flight and chase camera
+- [x] Unity 6 project (URP)
+- [x] Ship flight and chase camera
 - [ ] Space combat: blasters, enemy drones, waves, HUD
 - [ ] Warp drive and the first planet (Verdance)
 - [ ] Upgrade shop
@@ -113,6 +113,22 @@ Every planet holds one signal fragment. Each fragment is a short log from the pe
    git clone https://github.com/miguelr-dev/driftlight.git
    ```
 3. In Unity Hub choose **Add → Add project from disk** and pick the `driftlight` folder.
+4. Open `Assets/Scenes/Space.unity` and press **Play**. Click the Game view to capture the mouse; **Esc** frees it.
+
+### Controls
+
+| Ship | |
+|---|---|
+| Mouse | Steer (the small diamond shows how hard you're turning) |
+| W / S | Thrust / brake |
+| A / D | Strafe |
+| Q / E | Roll |
+| Space / Ctrl | Up / down |
+| Shift | Boost |
+
+### Scene builder
+
+The scenes, materials, textures and meshes in `Assets/Driftlight/Generated` and `Assets/Scenes` are generated from code by the **DRIFTLIGHT** menu in Unity (`Assets/Driftlight/Editor/DriftlightBuilder*.cs`): procedural skyboxes, planet textures, asteroids and the relay station. **Rebuilding a scene overwrites it**, so once someone starts hand-editing a scene, stop rebuilding that one.
 
 ## How we work
 
