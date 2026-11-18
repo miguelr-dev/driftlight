@@ -2,7 +2,7 @@
 
 > A single-player 3D space exploration shooter, built in Unity 6.
 
-You're a lone scavenger pilot who picks up a mysterious signal from a dead star system. Every planet in the system once had a thriving civilization, and every one of them vanished on the same day. Warp between planets, fight what is guarding them, upgrade your ship, and follow the signal to its source.
+You're a lone scavenger pilot who picks up a mysterious signal from a dead star system. Every planet in the system once had a thriving civilization, and every one of them vanished on the same day. Fight your way past what guards it, explore two strange worlds on foot, upgrade your ship, and follow the signal to its source.
 
 ---
 
@@ -19,56 +19,51 @@ We both work across the whole stack: the "backend" (gameplay code, AI, upgrade a
 
 ## Current target for the game
 
-*This is the target as of the first group review. It will change as we playtest.*
+*Target as of the first group review: a tight, polished game of **about 15 minutes**. It will change as we playtest.*
 
 **Genre:** single-player 3D action exploration (space combat + on-foot exploration), with a mystery story.
 
+### The run (about 15 minutes)
+
+| # | Stop | What happens | Time |
+|---|---|---|---|
+| 1 | **The Drift** | Space fight at the derelict signal relay, then warp | ~2 min |
+| 2 | **Verdance** | Glowing jungle at dusk. Learn the **scanner**, follow the beam, recover signal fragment 1 | ~3–4 min |
+| 3 | **Cinder** | Lava fields and eruptions. Use the **jetpack** to cross the lava to fragment 2 | ~3–4 min |
+| 4 | **The Source** | Short boss fight, fragment 3 and the story reveal | ~4 min |
+
+Between planets you **pick 1 of 3 upgrades** (shields, fire rate or boost), paid for with the salvage you collected.
+
 ### Core loop
-1. **Warp** to a planet. Your warp drive's range decides which planets you can reach.
-2. **Fight** enemy ships in orbit (arcade-style space combat).
-3. **Land** and explore the planet surface on foot with your blaster and tools.
-4. **Collect** salvage and a **signal fragment**, a piece of the story.
-5. **Upgrade** your ship and gear, then warp further into the system.
-
-### Planets
-Each planet has its own look, its own mechanic and its own enemies. The target is **5 polished planets**; the rest are stretch goals.
-
-| # | Planet | Look | Unique mechanic | Enemies |
-|---|---|---|---|---|
-| 1 | **Verdance** | Glowing alien jungle | Tutorial planet | Spore drones |
-| 2 | **Cinder** | Lava fields, ash skies | Eruptions to dodge | Magma crawlers |
-| 3 | **Glacius** | Ice caves, auroras | Slippery ground, cold meter | Ice stalkers |
-| 4 | **Mirage** | Desert ruins | Sandstorms that hide enemies | Sand wraiths |
-| 5 | **Abyssa** | Ocean world, floating islands | Jetpack between islands | Sky eels |
-| 6 | *Prism* (stretch) | Crystal planet | Light-refraction puzzles | Crystal sentinels |
-| 7 | *Hollow* (stretch) | Dead moon, ship graveyard | Flashlight-only horror level | Hijacked ship AI |
-| 8 | **The Source** | Final planet | Boss fight and the story reveal | ??? |
-
-### Upgrades
-- **Ship:** hull, shields, weapons (blasters → missiles → charge beam), boost, **warp range** (unlocks new planets)
-- **Tools:** blaster upgrades, **scanner** (reveals clues and weak points), **grapple**, **jetpack**
-- **Currency:** salvage from destroyed enemies and planet surfaces
+1. **Fight** enemy ships in space (arcade-style combat).
+2. **Warp** to the next planet.
+3. **Explore** the surface on foot with your tools.
+4. **Recover** the planet's signal fragment, a piece of the story.
+5. **Upgrade**, then warp deeper into the system.
 
 ### The mystery
-Every planet holds one signal fragment. Each fragment is a short log from the people who vanished, and together they explain what happened on the day everyone disappeared, and why the signal is calling *you*.
+There are three signal fragments, one on each stop. Each is a short log from the people who vanished, and together they explain what happened on the day everyone disappeared, and why the signal is calling *you*.
+
+### Cut for time
+Glacius, Mirage, Abyssa, Prism and Hollow, the grapple, and a full upgrade shop. We'll only bring one back if the 15-minute version is finished and polished.
 
 ---
 
 ## Goals for each member
 
 ### Miguel Reese
-- Arcade ship flight model and chase camera
-- Ship weapons, enemy ship AI and combat encounters in orbit
-- Warp drive: charge-up, warp tunnel effect, travel between planets
-- Ship upgrade system (hull, shields, weapons, warp range)
+- Ship flight, chase camera and space combat (done for the first fight)
+- Warp drive and travel between stops
+- Verdance and The Source, including the boss fight
+- Hooking the upgrade picker into the ship's stats
 - Space visuals: skyboxes, explosions, engine trails, warp streaks
 
 ### Mark Guggenheim
-- First-person on-foot controller for planet surfaces
-- Planet surfaces and level design: Verdance first, then Cinder, Glacius, Mirage and Abyssa
-- Tools: scanner, grapple, jetpack
-- HUD, menus, upgrade shop UI, save and load
-- Story: signal fragments, lore logs and the final reveal
+- UI style and mockups (done, see `docs/mockups`)
+- Main menu and the upgrade picker screen
+- Cinder: level design, lava hazards and eruptions
+- Story: the three signal-fragment logs and the final reveal (`docs/STORY.md`)
+- Tools on foot: scanner and jetpack
 
 ### Both of us
 - Playtesting and balancing
@@ -87,21 +82,25 @@ Every planet holds one signal fragment. Each fragment is a short log from the pe
 
 - [x] Repo, Unity `.gitignore` and README
 - [x] Unity 6 project (URP)
+- [x] UI style and mockups
 - [x] Ship flight and chase camera
 - [x] Space combat: blasters, enemy drones, waves, HUD
 - [x] Warp drive and the first planet (Verdance)
-- [ ] Upgrade shop
-- [ ] Planets 2–5
-- [ ] Final planet, boss and story reveal
+- [ ] Main menu
+- [ ] Story bible and fragment logs
+- [ ] Cinder
+- [ ] Upgrade picker
+- [ ] Scanner and jetpack
+- [ ] The Source: boss fight and reveal
 
 ## Roadmap
 
 | Milestone | Goal |
 |---|---|
-| **Group review (now)** | Fly the ship, fight enemy drones, warp to Verdance and walk around |
-| **Milestone 2** | 2 planets, salvage and the upgrade shop, basic menus |
-| **Milestone 3** | 5 planets, full story, boss fight |
-| **Final** | Polish: audio, effects, menus, balancing; stretch planets if there is time |
+| **Group review (now)** | Fly the ship, fight enemy drones, warp to Verdance, recover fragment 1 |
+| **Milestone 2** | Main menu, Cinder, the upgrade picker, the full story |
+| **Milestone 3** | The Source and the boss; the whole 15-minute run playable start to finish |
+| **Final** | Polish: audio, effects, balancing, the gameplay video |
 
 ---
 
